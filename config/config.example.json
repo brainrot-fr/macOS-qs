@@ -1,0 +1,24 @@
+{
+  "schemaVersion": 1,
+  "autostart": true,
+  "modules": {
+    "wifi": true,
+    "volume": true,
+    "battery": true,
+    "bluetooth": true,
+    "inputLayout": true,
+    "notifications": true,
+    "controlCenter": true,
+    "userSession": true
+  },
+  "dock": {
+    "pinnedIds": [
+      "firefox",
+      "org.kde.dolphin",
+      "foot"
+    ]
+  },
+  "logging": {
+    "level": "info"
+  }
+}

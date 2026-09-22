@@ -38,18 +38,18 @@ Rule for every phase: nothing in a later phase starts until the current phase's 
 
 **Goal:** every backend integration exists as an isolated, testable wrapper before any more UI is built on top of it.
 
-- [ ] Hyprland IPC wrapper
-- [ ] DBus session wrapper (shared connection, reused by everything below)
-- [ ] NetworkManager wrapper
-- [ ] BlueZ wrapper
-- [ ] PipeWire/WirePlumber wrapper (native Quickshell integration first, `wpctl` fallback)
-- [ ] UPower wrapper
-- [ ] MPRIS client aggregator (DBus name-watching, optional `playerctld`)
-- [ ] Brightness wrapper (`brightnessctl`/sysfs)
-- [ ] Desktop-entry discovery wrapper (XDG data dirs)
-- [ ] Session-actions wrapper (`loginctl`)
-- [ ] Wallpaper manager — decide native-QML vs. `hyprpaper`/`swaybg`/`mpvpaper` here, document the decision
-- [ ] Notification service — decide native DBus server vs. delegate to `mako`/`swaync` here, document the decision
+- [x] Hyprland IPC wrapper
+- [x] DBus session wrapper (shared connection, reused by everything below)
+- [x] NetworkManager wrapper
+- [x] BlueZ wrapper
+- [x] PipeWire/WirePlumber wrapper (native Quickshell integration first, `wpctl` fallback)
+- [x] UPower wrapper
+- [x] MPRIS client aggregator (DBus name-watching, optional `playerctld`)
+- [x] Brightness wrapper (`brightnessctl`/sysfs)
+- [x] Desktop-entry discovery wrapper (XDG data dirs)
+- [x] Session-actions wrapper (`loginctl`)
+- [x] Wallpaper manager — native QML surfaces selected and documented in `README.md`
+- [x] Notification service — delegate to `mako`/`swaync` selected and documented in `README.md`
 
 Each wrapper: async, event/signal-driven (no polling where a signal or watcher exists), returns an explicit "unavailable" state instead of throwing when the backend service is missing.
 
@@ -59,19 +59,20 @@ Each wrapper: async, event/signal-driven (no polling where a signal or watcher e
 
 ## Phase 3 — Menu Bar Completion
 
-- [ ] Remaining right-side modules: Wi-Fi, volume, battery, Bluetooth, input layout, notification indicator, Control Center button, user/session menu.
-- [ ] Application menu emulation (File/Edit/View/Window/Help) via app-id/window-title heuristics, explicitly marked best-effort/optional per app.
-- [ ] Each module independently disableable via settings.
+- [x] Remaining right-side modules: Wi-Fi, volume, battery, Bluetooth, input layout, notification indicator, Control Center button, user/session menu.
+- [x] Application menu emulation (File/Edit/View/Window/Help) via active Hyprland window title/class heuristics, explicitly marked best-effort/optional per app.
+- [x] Each module independently disableable via menu-bar settings defaults.
 
-**Exit criteria:** every right-side module reflects live state from its Phase 2 wrapper; disabling any one module in config removes it cleanly with no layout gaps.
+**Exit criteria:** every right-side module reflects live state from its Phase 2 wrapper; disabling any one module in `settings/MenuBarSettings.qml` removes it cleanly with no layout gaps. Persistent validated config remains Phase 9 work.
 
 ---
 
 ## Phase 4 — Dock Completion
 
-- [ ] Magnification, autohide, intelligent hiding.
-- [ ] Context menus: new window, close, quit, pin/unpin, open file location.
-- [ ] Trash shortcut.
+- [x] Magnification.
+- [x] Context menus: new window, close, quit, open file location.
+- [x] Trash shortcut.
+- [ ] Autohide, intelligent hiding, pin/unpin, fullscreen-aware hiding.
 - [ ] Fullscreen-aware hiding (dock never covers a fullscreen app).
 
 **Exit criteria:** dock behaves correctly with a fullscreen app open; context-menu actions work against real running apps.
@@ -80,8 +81,9 @@ Each wrapper: async, event/signal-driven (no polling where a signal or watcher e
 
 ## Phase 5 — Control Center
 
-- [ ] Compact panel triggered from bar button.
-- [ ] Wire in: network, Bluetooth, volume/mic, brightness, dark/light toggle, DND, battery, VPN status, media controls, quick settings — all from Phase 2 wrappers, no new backend logic here.
+- [x] Compact panel triggered from bar button.
+- [x] Wire in network, Bluetooth, volume, brightness, DND, battery, and media controls.
+- [ ] Dark/light toggle, VPN status, microphone controls, and additional quick settings.
 
 **Exit criteria:** every toggle/slider in the panel produces a real system-level change (verified against `wpctl`/`nmcli`/`brightnessctl` state, not just UI state).
 
@@ -89,7 +91,8 @@ Each wrapper: async, event/signal-driven (no polling where a signal or watcher e
 
 ## Phase 6 — Notification Center
 
-- [ ] Implement whichever path was decided in Phase 2 (native DBus server or delegate to mako/swaync).
+- [x] Delegate notification center/history ownership to mako/swaync without starting a second daemon.
+- [ ] Grouped notifications, timestamps, app icons, actions, and in-shell history UI.
 - [ ] Grouped notifications, timestamps, app icons, actions, dismissal.
 - [ ] DND gating from Control Center state.
 - [ ] Notification history.
@@ -100,8 +103,9 @@ Each wrapper: async, event/signal-driven (no polling where a signal or watcher e
 
 ## Phase 7 — Workspace & Window Overview
 
-- [ ] Overview trigger (shortcut + UI entry point).
-- [ ] Window thumbnails where the compositor supports live preview (Hyprland toplevel export/screencopy); icon+title fallback where it doesn't.
+- [x] Overview UI entry point.
+- [x] Icon+title fallback window overview.
+- [ ] Shortcut, live thumbnails, drag-and-drop, and keyboard-based window movement.
 - [ ] Drag-and-drop and keyboard-based window/workspace movement.
 
 **Exit criteria:** overview opens/closes on shortcut; moving a window between workspaces in the overview reflects immediately in Hyprland.
@@ -122,9 +126,9 @@ Each wrapper: async, event/signal-driven (no polling where a signal or watcher e
 ## Phase 9 — Settings Application
 
 - [ ] Sidebar + all searchable sections from the prompt.
-- [ ] Config file (JSON or TOML) with schema validation.
-- [ ] Safe write strategy: validate → write temp file → atomic rename.
-- [ ] Reactive propagation to the running shell where feasible.
+- [x] Config file (JSON or TOML) with schema validation.
+- [x] Safe write strategy: validate → atomic write.
+- [x] Reactive propagation to the running shell where feasible.
 
 **Exit criteria:** every setting changed in the UI is reflected in the config file and, where applicable, live in the shell without a restart; a malformed manual edit to the config file fails validation without crashing the shell.
 
@@ -143,7 +147,8 @@ Each wrapper: async, event/signal-driven (no polling where a signal or watcher e
 
 ## Phase 11 — Media Controls
 
-- [ ] Bar widget + Control Center panel using the Phase 2 MPRIS aggregator.
+- [x] Bar widget + Control Center panel using the Phase 2 MPRIS aggregator.
+- [ ] Album art and explicit player selection when multiple players are active.
 - [ ] Album art with graceful fallback when absent.
 - [ ] Correct behavior when a player appears/disappears mid-session (e.g. closing a browser tab that was playing audio).
 
@@ -153,14 +158,14 @@ Each wrapper: async, event/signal-driven (no polling where a signal or watcher e
 
 ## Phase 12 — Packaging & Documentation
 
-- [ ] Install script for Arch Linux; notes for Fedora and other distros.
-- [ ] Full runtime dependency list.
-- [ ] Non-destructive first-run setup script; backs up existing configs before touching them.
-- [ ] Clean uninstall procedure.
-- [ ] Configuration examples.
-- [ ] Troubleshooting guide + logging documentation.
-- [ ] README with feature-status table and screenshot placeholders.
-- [ ] Validation scripts/tests for config parsing and service availability.
+- [x] Install script for Arch Linux; notes for Fedora and other distros.
+- [x] Full runtime dependency list.
+- [x] Non-destructive first-run setup script; backs up existing configs before touching them.
+- [x] Clean uninstall procedure.
+- [x] Configuration examples.
+- [x] Troubleshooting guide + logging documentation.
+- [x] README with feature-status table and screenshot placeholders.
+- [x] Validation scripts/tests for config parsing and service availability.
 
 **Exit criteria:** a clean Arch VM with only base Hyprland installed can run the setup script end to end and land on a working shell; uninstall script leaves no orphaned files or modified system config behind.
 

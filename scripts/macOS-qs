@@ -1,0 +1,13 @@
+#!/bin/sh
+
+set -eu
+
+project_root=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
+
+if ! command -v quickshell >/dev/null 2>&1; then
+    printf '%s\n' "macOS-qs: quickshell was not found in PATH." >&2
+    printf '%s\n' "Install Quickshell 0.2.1 or make it available to this user." >&2
+    exit 127
+fi
+
+exec quickshell --no-duplicate -p "$project_root"

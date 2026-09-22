@@ -8,10 +8,12 @@ Item {
     property int activeId: 1
     property var ids: [1, 2, 3, 4, 5]
     property var clients: []
+    property var activeClient: ({})
 
     function refresh() {
         activeProcess.running = true
         clientsProcess.running = true
+        activeClientProcess.running = true
     }
 
     function switchTo(id) {
@@ -48,12 +50,26 @@ Item {
     }
 
     Process {
+        id: activeClientProcess
+        command: ["sh", "-c", "hyprctl activewindow -j 2>/dev/null"]
+        stdout: StdioCollector {
+            onStreamFinished: {
+                try {
+                    root.activeClient = JSON.parse(text)
+                } catch (error) {
+                    root.activeClient = ({})
+                }
+            }
+        }
+    }
+
+    Process {
         id: switchProcess
         command: ["hyprctl", "dispatch", "workspace", "1"]
     }
 
     Timer {
-        interval: 700
+        interval: 1500
         running: true
         repeat: true
         onTriggered: root.refresh()
